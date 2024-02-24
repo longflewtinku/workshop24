@@ -1,0 +1,158 @@
+
+## workshop
+-----------
+pipeline {
+    agent any
+
+    stages {   
+        stage('image workshop') {
+            steps {
+                sh """
+                      docker pull pitstop/workshopmanagementapi:1.0
+                      docker image tag pitstop/workshopmanagementapi:1.0 longflew/laxmigopi:workshop
+                      docker image push longflew/laxmigopi:workshop"""
+                     
+            }
+        }
+    }
+}
+## maildev
+---------
+pipeline {
+    agent any
+
+    stages {   
+        stage('image maildev') {
+            steps {
+                sh """
+                      docker pull maildev/maildev:1.1.0
+                      docker image tag maildev/maildev:1.1.0 longflew/laxmigopi:maildev
+                      docker image push longflew/laxmigopi:maildev"""
+                     
+            }
+        }
+    }
+}
+## pitstop/customermanagementapi:1.0
+pipeline {
+    agent any
+
+    stages {   
+        stage('pitstop/customermanagementapi:1.0') {
+            steps {
+                sh """
+                      docker pull pitstop/customermanagementapi:1.0
+                      docker image tag pitstop/customermanagementapi:1.0 longflew/laxmigopi:customeMA
+                      docker image push longflew/laxmigopi:customeMA"""
+                     
+            }
+        }
+    }
+}
+### pitstop/auditlogservice:1.0
+pipeline {
+    agent any
+
+    stages {   
+        stage('pitstop/auditlogservice:1.0') {
+            steps {
+                sh """
+                      docker pull pitstop/auditlogservice:1.0
+                      docker image tag pitstop/auditlogservice:1.0 longflew/laxmigopi:auditlogservice
+                      docker image push longflew/laxmigopi:auditlogservice"""
+                     
+            }
+        }
+    }
+}
+### pitstop/invoiceservice:1.0
+pipeline {
+    agent any
+
+    stages {   
+        stage('pitstop/invoiceservice:1.0') {
+            steps {
+                sh """
+                      docker pull pitstop/invoiceservice:1.0
+                      docker image tag pitstop/invoiceservice:1.0 longflew/laxmigopi:invoiceservice
+                      docker image push longflew/laxmigopi:invoiceservice"""
+                     
+            }
+        }
+    }
+}
+### pitstop/notificationservice:1.0
+pipeline {
+    agent any
+
+    stages {   
+        stage('pitstop/notificationservice:1.0') {
+            steps {
+                sh """
+                      docker pull pitstop/notificationservice:1.0
+                      docker image tag pitstop/notificationservice:1.0 longflew/laxmigopi:notificationservice
+                      docker image push longflew/laxmigopi:notificationservice"""
+                     
+            }
+        }
+    }
+}
+### pitstop/timeservice:1.0
+pipeline {
+    agent any
+
+    stages {   
+        stage('pitstop/timeservice:1.0') {
+            steps {
+                sh """
+                      docker pull pitstop/timeservice:1.0
+                      docker image tag pitstop/timeservice:1.0 longflew/laxmigopi:timeservice
+                      docker image push longflew/laxmigopi:timeservice"""
+                     
+            }
+        }
+    }
+}
+### pitstop/workshopmanagementeventhandler:1.0
+pipeline {
+    agent any
+
+    stages {   
+        stage('pitstop/workshopmanagementeventhandler:1.0') {
+            steps {
+                sh """
+                      docker pull pitstop/workshopmanagementeventhandler:1.0
+                      docker image tag pitstop/workshopmanagementeventhandler:1.0 longflew/laxmigopi:workshopmanagementeventhandler
+                      docker image push longflew/laxmigopi:workshopmanagementeventhandler"""
+                     
+            }
+        }
+    }
+}
+====================================================================================
+pipeline{
+    agent any
+    stages{
+        stage ('git checkout'){
+            steps{
+                git url: 'https://github.com/hashicorp/learn-terraform-provision-aks-cluster',
+                branch: 'main'
+            }
+        }
+		stage('terraform init'){
+            steps{
+                sh """
+                      cd learn-terraform-provision-aks-cluster
+				      terraform init
+				      terraform apply -auto-approve
+					  az aks get-credentials --resource-group $(terraform output -raw resource_group_name) --name $(terraform output -raw kubernetes_cluster_name)"""
+				
+            }
+        }
+        stage('k8s deployment'){
+            steps{
+                sh "kubectl apply -f deployment/"
+            }
+        }
+    }
+}
