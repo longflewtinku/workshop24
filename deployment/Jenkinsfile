@@ -1,4 +1,20 @@
+## webapp
+-----------
+pipeline {
+    agent any
 
+    stages {   
+        stage('pitstop/webapp:1.0') {
+            steps {
+                sh """
+                      docker pull pitstop/webapp:1.0
+                      docker image tag pitstop/webapp:1.0 longflew/laxmigopi:webapp1
+                      docker image push longflew/laxmigopi:webapp1"""
+                     
+            }
+        }
+    }
+}
 ## workshop
 -----------
 pipeline {
